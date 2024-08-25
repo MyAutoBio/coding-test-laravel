@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 
 class ListAllCustomersController extends Controller
@@ -16,38 +17,53 @@ class ListAllCustomersController extends Controller
             'based_on' => ['sometimes', 'in:customer_email,order_number,item_name'],
         ]);
 
-        $customers = Customer::query();
+        $output = collect([]);
 
-        if ($request->get('search') && $request->has('based_on')) {
-            $search = $request->get('search');
+        // Eager load necessary relationships and chunk results into parts of 100 records
+        Customer::with(['addresses', 'orders.items'])->chunk(100, function ($users) use ($request, &$output) {
+            if ($request->get('search') && $request->has('based_on')) {
+                $search = $request->get('search');
+                $output = $output->merge($this->filterRecords($users, $search)->values());
+            }
+        });
 
-            $customers = $this->filterRecords($customers, $search);
-        }
-
-        $customers = $customers->with('addresses', 'orders.items')
-            ->paginate();
+        $customers = $this->paginateResults($output);
 
         return view('customers.index', compact('customers'));
     }
 
     private function filterRecords($customers, $search)
     {
-        switch(request()->get('based_on')) {
-            case 'customer_email':
-                $customers->where('email', $search);
-                break;
-            case 'order_number':
-                $customers->whereHas('orders', function ($query) use ($search) {
-                    return $query->where('reference', 'LIKE', "%$search%");
-                });
-                break;
-            case 'item_name':
-                $customers->whereHas('orders.items', function ($query) use ($search) {
-                    return $query->where('item', 'LIKE', "%$search%");
-                });
-                break;
-        }
+        return $customers->filter(function ($customer) use ($search) {
+            switch (request()->get('based_on')) {
+                case 'customer_email':
+                    return stripos($customer->email, $search) !== false;
+                case 'order_number':
+                    return $customer->orders->contains(function ($order) use ($search) {
+                        return stripos($order->reference, $search) !== false;
+                    });
+                case 'item_name':
+                    return $customer->orders->flatMap->items->contains(function ($item) use ($search) {
+                        return stripos($item->item, $search) !== false;
+                    });
+                default:
+                    return false;
+            }
+        });
+    }
 
-        return $customers;
+    private function paginateResults($output)
+    {
+        $page = request()->input('page', 1);
+        $perPage = 10;
+        $total = $output->count();
+
+        return new LengthAwarePaginator(
+            $output->forPage($page, $perPage),
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
     }
 }

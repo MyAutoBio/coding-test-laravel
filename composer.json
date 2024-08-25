@@ -17,8 +17,7 @@
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^11.0.1",
-        "beyondcode/laravel-query-detector": "dev-l11-compatibility"
+        "phpunit/phpunit": "^11.0.1"
     },
     "autoload": {
         "files": [
@@ -67,11 +66,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/laravel-shift/laravel-query-detector.git"
-        }
-    ]
+    "prefer-stable": true
 }

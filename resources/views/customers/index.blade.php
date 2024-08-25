@@ -52,19 +52,19 @@
                 @forelse($customers as $customer)
                     <tr class="hover:bg-gray-100 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $customer->name }}
+                            {{ $customer['name'] }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $customer->email }}
+                            {{ $customer['email'] }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <a target="_blank" href="#" class="text-indigo-600 font-bold">{{ $customer->addresses->count() }}</a>
+                            <a target="_blank" href="#" class="text-indigo-600 font-bold">{{ count($customer['addresses']) }}</a>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <a target="_blank" href="#" class="text-indigo-600 font-bold">{{ $customer->orders->count() }}</a>
+                            <a target="_blank" href="#" class="text-indigo-600 font-bold">{{ count($customer['orders']) }}</a>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a target="_blank" href="{{ route('customers.show', $customer->id) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Details') }}</a>
+                            <a target="_blank" href="{{ route('customers.show', $customer['id']) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Details') }}</a>
                         </td>
                     </tr>
                 @empty
