@@ -19,11 +19,14 @@ class ListAllCustomersController extends Controller
 
         $output = collect([]);
 
-        // Eager load necessary relationships and chunk results into parts of 100 records
-        Customer::with(['addresses', 'orders.items'])->chunk(100, function ($users) use ($request, &$output) {
+        // Eager load necessary relationships and chunk results into parts of 1000 records
+        Customer::with(['addresses', 'orders.items'])->chunk(1000, function ($users) use ($request, &$output) {
             if ($request->get('search') && $request->has('based_on')) {
                 $search = $request->get('search');
+
                 $output = $output->merge($this->filterRecords($users, $search)->values());
+            } else {
+                $output = $output->merge($users);
             }
         });
 
