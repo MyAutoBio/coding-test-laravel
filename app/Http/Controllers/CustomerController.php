@@ -27,7 +27,7 @@ class CustomerController extends Controller
             $customers->whereHas('orders.items');
         }
 
-        $customers = $customers->paginate(10);
+        $customers = $customers->paginate($this->pagination);
 
         return view('customer.index', compact('customers'));
     }
