@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Order;
 use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
