@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    ports:
+      - 80:80
+      - 5173:5173
+    expose:
+      - "9000"
+      - "9003"
+    environment:
+      PHP_XDEBUG_ENABLED: 1
+      XDEBUG_CONFIG: ${XDEBUG_CONFIG:-client_host=host.docker.internal}
+      PHP_IDE_CONFIG: "serverName=Backend"
+    volumes:
+      - ./ssh:/var/www/.ssh
+      - ./:/var/www/html
+    container_name: coding_test_laravel_backend
+  database:
+     image: mysql:8.1
+     command: --default-authentication-plugin=mysql_native_password
+     environment:
+       MYSQL_ROOT_PASSWORD: password
+       MYSQL_DATABASE: project
+     volumes:
+       - docker-data:/var/lib/mysql
+     ports:
+       - "3306:3306"
+     container_name: coding_test_laravel_db
+  queue:
+     image: rabbitmq:3-management
+     ports:
+       - 15672:15672
+     environment:
+       - RABBITMQ_DEFAULT_USER=admin
+       - RABBITMQ_DEFAULT_PASS=password
+     container_name: coding_test_laravel_queue
+volumes:
+    docker-data: null
