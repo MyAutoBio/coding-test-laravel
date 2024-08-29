@@ -1,0 +1,10 @@
+Host *
+  ServerAliveInterval 120
+  StrictHostKeyChecking no
+
+
+Host cfd-ipunto.com
+  User nginx
+  HostName cfd-ipunto.com
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
