@@ -14,9 +14,10 @@ class ListAllCustomersController extends Controller
     {
         $request->validate([
             'search' => ['sometimes', 'string'],
-            'based_on' => ['sometimes', 'in:customer_email,order_number,item_name'],
+//            'based_on' => ['sometimes', 'in:customer_email,order_number,item_name'],
         ]);
 
+        $search = $request->get('search');
         $output = collect([]);
 
         // Eager load necessary relationships and chunk results into parts of 1000 records

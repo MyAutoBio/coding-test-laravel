@@ -1,0 +1,33 @@
+name: Build App
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: laravel
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+      - name: Install dependencies
+        run: composer install
+      - name: Run migrations
+        env:
+          DB_DATABASE: laravel
+          DB_PASSWORD: password
+        run: php artisan migrate
+      - name: Seed data
+        run: php artisan db:seed
