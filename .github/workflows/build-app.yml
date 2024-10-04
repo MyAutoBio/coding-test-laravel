@@ -1,4 +1,5 @@
 name: Build App
+run-name: Build App
 on:
   push:
     branches:
@@ -28,6 +29,7 @@ jobs:
         env:
           DB_DATABASE: laravel
           DB_PASSWORD: password
+          DB_PORT: 3306
         run: php artisan migrate
       - name: Seed data
         run: php artisan db:seed
