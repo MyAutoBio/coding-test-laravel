@@ -31,6 +31,6 @@ jobs:
           DB_DATABASE: laravel
           DB_PASSWORD: password
           DB_PORT: 3306
-        run: php artisan migrate
+        run: php artisan migrate --force
       - name: Seed data
         run: php artisan db:seed
