@@ -1,0 +1,37 @@
+name: Build App
+run-name: Build App
+on:
+  push:
+    branches:
+      - haytam-coding-challenge
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: laravel
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+      - name: Install dependencies
+        run: composer install
+      - name: Run migrations
+        env:
+          DB_USERNAME: root
+          DB_DATABASE: laravel
+          DB_PASSWORD: password
+          DB_PORT: 3306
+        run: php artisan migrate --force
+      - name: Seed data
+        run: php artisan db:seed
